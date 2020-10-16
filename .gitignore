@@ -1,0 +1,7 @@
+client/.vscode
+
+client/build
+client/tmp
+client/.qmake.stash
+client/Makefile
+
