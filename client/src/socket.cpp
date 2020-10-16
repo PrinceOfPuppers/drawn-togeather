@@ -1,12 +1,7 @@
 #include "socket.h"
 #include <QFile>
 
-void Socket::init(){
-    cout << "trest"<<"\n";
-}
-
 void Socket::connect(const char ip[], int port){
-
 
     cout <<"connecting to: "<< ip <<":"<<1234<<"\n";
     this->conn.connectToHost(ip,port);
@@ -15,10 +10,10 @@ void Socket::connect(const char ip[], int port){
 
     if(conn.waitForConnected(waittime)){
 
-        cout <<"connected"<<"\n";
+        cout <<"connected\n\n";
     }
     else{
-        std::cout <<"not connected"<<"\n";
+        cout <<"not connected\n";
     }
 
 
@@ -44,10 +39,9 @@ bool Socket::is_active(){
 
 
 // TODO check both of these for memeory leaks
-void Socket::send_json(QJsonObject *json_obj){
+void Socket::send_json(QJsonObject *json){
 
-    QByteArray serialized = QJsonDocument(*json_obj).toJson();
-    qDebug() << serialized;
+    QByteArray serialized = QJsonDocument(*json).toJson();
     conn.write(serialized);
 
     conn.waitForBytesWritten(); 
@@ -56,27 +50,30 @@ void Socket::send_json(QJsonObject *json_obj){
 QJsonObject* Socket::recieve_json(){
     while(true){
 
-        conn.waitForReadyRead(); 
+        if (conn.waitForReadyRead(-1)){
 
-        if (conn.bytesAvailable() > 0){
             QByteArray data = conn.readAll();
             QJsonDocument response = QJsonDocument::fromJson(data);
 
-            qDebug() << response;
-
             QJsonObject *obj = new QJsonObject(response.object());
+
             return obj; 
         }
     }
 }
 
+// sends and deallocates messages in the sending queue
 void Socket::sending_loop(){
     while (this->is_active()){
-        this->send_json(this->sending.pop());
+        QJsonObject *json = this->sending.pop();
+        this->send_json(json);
+        delete json; // message is sent, deallocating queue item
     }
 }
 void Socket::receiving_loop(){
     while (this->is_active()){
-        this->receiving.push(this->recieve_json());
+        QJsonObject* a = this->recieve_json();
+
+        this->receiving.push(a);
     }
 }

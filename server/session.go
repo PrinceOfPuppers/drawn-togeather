@@ -9,8 +9,10 @@ import (
 	//"time"
 )
 
-// a pair for holding json and who sent it
+
 type jsonSender struct{
+	// a pair for holding json and who sent it
+
 	sessionNum int
 	json *map[string]interface{}
 }
@@ -87,8 +89,6 @@ func (sess session) recieveJSON() *map[string]interface{}{
     return data
 }
 func (sess session) sendJSON(data *map[string]interface{}){
-	fmt.Println(*data)
-	
 	err := sess.encoder.Encode(data)
     
     if err!= nil{

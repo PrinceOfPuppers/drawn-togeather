@@ -11,23 +11,34 @@
 #include <chrono>
 using namespace std;
 
+int readInput(Socket *s){
+    while (true){
+        QJsonObject response = *s->pop();
+        
+        cout << "> " <<response["message"].toString().toUtf8().constData();
+    }
+
+}
+
 
 int main(){
     Socket sock;
-    sock.init();
 
 
     const char ip[] = "127.0.0.1";
 
     sock.connect(ip, 1234);
-    QJsonObject json;
-    json.insert("test",1.0);
-    json.insert("調子はどう",4);
 
 
-    sock.push(&json);
+    thread t = thread(readInput, &sock);
+    while (true){
+        char* message = new(char);
+        cin >> message;
 
-    QJsonObject response = *sock.pop();
-
-    qDebug() << response;
+        QJsonObject* reply = new(QJsonObject);
+        //cout<<"testing...\n";
+        reply->insert("message",message);
+        //cout<<"...123\n";
+        sock.push(reply);
+    }
 }

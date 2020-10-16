@@ -76,7 +76,7 @@ func (serv server) relayLoop(){
 }
 // go routine for adding new sessions to the server
 func (serv server) listenLoop(){
-	fmt.Println("listening...")
+	fmt.Println("listening...\n")
 	for serv.isActive(){
 		conn, err := serv.li.Accept()
 		if err!=nil{
@@ -89,30 +89,5 @@ func (serv server) listenLoop(){
 		*serv.nextSessNum++
 
 		// add new session event here
-	}
-
-}
-
-func (serv server) mainLoop(){
-
-	for serv.isActive(){
-		event := *<-serv.eventChan
-
-		switch event.eType {
-		case inJSON:
-			data, ok := event.data.(*jsonSender)
-			if !ok{
-				fmt.Println("wrong data type in event")
-			}
-			serv.relayChan <- data
-		
-		case sessionDisc:
-			data, ok := event.data.(int)
-			if !ok{
-				fmt.Println("wrong data type in event")
-			}
-			delete(serv.sessions,data)
-			fmt.Printf("session number %v disconnected\n",data)
-		}
 	}
 }

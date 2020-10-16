@@ -12,4 +12,4 @@ HEADERS += include/*.h
 QT += core
 QT += network
 
-TARGET = build/test
+TARGET = build/client

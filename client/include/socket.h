@@ -50,20 +50,18 @@ class BlockingQueue
 //    serv_close
 //};
 //
-//template <typename T>
+//
 //struct sock_event{
 //    sock_event_type e_type;
-//    T data;
-//
+//    void *data;             // type is determined by event type
 //};
 
 
 class Socket
 {
     public: 
-        void init();
         void connect(const char[], int);
-        void push(QJsonObject*);
+        void push(QJsonObject*); // QJsonObject* must be heap allocated so it can be deallocated after being sent
         QJsonObject* pop();
         bool empty(); // indicates if recieving is empty
 
